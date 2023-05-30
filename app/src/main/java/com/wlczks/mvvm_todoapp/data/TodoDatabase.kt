@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 //baza danych
 @Database(
     entities = [Todo::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 abstract class TodoDatabase: RoomDatabase() {

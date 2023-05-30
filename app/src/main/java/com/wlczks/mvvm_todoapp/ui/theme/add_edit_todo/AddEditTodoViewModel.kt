@@ -30,17 +30,21 @@ class AddEditTodoViewModel @Inject constructor(
     var description by mutableStateOf("")
         private set
 
+    var priority by mutableStateOf("")
+        private set
 
-    private val _uiEvent =  Channel<UiEvent>()
+
+    private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
         val todoId = savedStateHandle.get<Int>("todoId")!!
-        if(todoId != -1) {
+        if (todoId != -1) {
             viewModelScope.launch {
                 repository.getTodoById(todoId)?.let { todo ->
                     title = todo.title
                     description = todo.description ?: ""
+                    priority = todo.priority ?: ""
                     this@AddEditTodoViewModel.todo = todo
                 }
             }
@@ -48,19 +52,27 @@ class AddEditTodoViewModel @Inject constructor(
     }
 
     fun onEvent(event: AddEditTodoEvent) {
-        when(event) {
+        when (event) {
             is AddEditTodoEvent.OnTitleChange -> {
                 title = event.title
             }
+
             is AddEditTodoEvent.OnDescriptionChange -> {
                 description = event.description
             }
+
+            is AddEditTodoEvent.OnPriorityChange -> {
+                priority = event.flagged
+            }
+
             is AddEditTodoEvent.OnSaveTodoClick -> {
                 viewModelScope.launch {
-                    if(title.isBlank()) {
-                        sendUiEvent(UiEvent.ShowSnackbar(
-                            message = "The title can't be empty"
-                        ))
+                    if (title.isBlank()) {
+                        sendUiEvent(
+                            UiEvent.ShowSnackbar(
+                                message = "The title can't be empty"
+                            )
+                        )
                         return@launch
                     }
                     repository.insertTodo(
@@ -68,7 +80,8 @@ class AddEditTodoViewModel @Inject constructor(
                             title = title,
                             description = description,
                             isDone = todo?.isDone ?: false,
-                            id = todo?.id
+                            id = todo?.id,
+                            priority = priority
                         )
                     )
                     sendUiEvent(UiEvent.PopBackStack)

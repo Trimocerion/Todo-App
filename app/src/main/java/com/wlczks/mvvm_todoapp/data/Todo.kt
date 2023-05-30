@@ -16,5 +16,7 @@ data class Todo(
 
     val isDone: Boolean,
 
+    val priority: String?,
 
-)
+
+    )

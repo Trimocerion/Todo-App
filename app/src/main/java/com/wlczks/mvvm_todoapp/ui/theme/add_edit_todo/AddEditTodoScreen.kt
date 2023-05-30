@@ -12,7 +12,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -28,7 +30,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.wlczks.mvvm_todoapp.components.HeaderTextComponent
+import com.wlczks.mvvm_todoapp.components.NormalTextComponent
 import com.wlczks.mvvm_todoapp.util.UiEvent
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -49,7 +54,8 @@ fun AddEditTodoScreen(
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         message = event.message,
-                        actionLabel = event.action
+                        actionLabel = event.action,
+                        duration = SnackbarDuration.Short
                     )
 
 
@@ -73,20 +79,29 @@ fun AddEditTodoScreen(
                     contentDescription = "Save"
                 )
             }
-        }) { innerPadding ->
+        }
+    ) { innerPadding ->
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(innerPadding)
         ) {
+
+            if (viewModel.title.isNotEmpty() || viewModel.description.isNotEmpty()) {
+                HeaderTextComponent(value = "Edit todo")
+                Spacer(modifier = Modifier.height(8.dp))
+            } else {
+                HeaderTextComponent(value = "Add todo")
+                Spacer(modifier = Modifier.height(8.dp))
+            }
             TextField(
                 value = viewModel.title,
                 onValueChange = {
                     viewModel.onEvent(AddEditTodoEvent.OnTitleChange(it))
                 },
                 placeholder = {
-                    Text(text = "Tytuł")
+                    Text(text = "Title")
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -97,7 +112,7 @@ fun AddEditTodoScreen(
                     viewModel.onEvent(AddEditTodoEvent.OnDescriptionChange(it))
                 },
                 placeholder = {
-                    Text(text = "Opis")
+                    Text(text = "Desc")
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = false,
@@ -105,7 +120,6 @@ fun AddEditTodoScreen(
             )
             // TODO: zrobic czas wprowadzania
 
-            val snackState = remember { SnackbarHostState() }
             val snackScope = rememberCoroutineScope()
 
             var dateValue by remember { mutableStateOf("") }
@@ -121,9 +135,21 @@ fun AddEditTodoScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            TextButton(onClick = { showDateView = true }) {
-                Text(text = dateValue.ifEmpty { "Wybierz datę" })
+
+            NormalTextComponent(value = "Date")
+
+            OutlinedButton(
+                onClick = { showDateView = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = dateValue.ifEmpty { "Choose date" },
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(8.dp),
+                )
             }
+
+
 
             if (showDateView) {
                 DatePickerDialog(
@@ -134,15 +160,19 @@ fun AddEditTodoScreen(
                         TextButton(
                             onClick = {
                                 showDateView = false
+                                showTimeView = true
                                 val selectedDate =
-                                    Instant.ofEpochMilli(datePickerState.selectedDateMillis ?: 0L)
+                                    Instant.ofEpochMilli(
+                                        datePickerState.selectedDateMillis ?: 0L
+                                    )
                                         .atZone(ZoneId.systemDefault())
                                         .toLocalDate()
                                 dateValue =
                                     selectedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                                 snackScope.launch {
-                                    snackState.showSnackbar(
+                                    snackbarHostState.showSnackbar(
                                         "Selected date: $dateValue"
+
                                     )
                                 }
                             },
@@ -165,26 +195,97 @@ fun AddEditTodoScreen(
                 }
             }
 
-            // SnackbarHost
-            SnackbarHost(hostState = snackState, modifier = Modifier)
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // TODO:  Trzeba zrobic Timepicker
+            NormalTextComponent(value = "Flag")
+
+            val items = listOf("High", "Normal", "Low")
+
+            var expanded by remember { mutableStateOf(false) }
 
 
-            // TODO: Flaga priorytetu
 
-        /*
-                       val priorityOptions = listOf("Low", "Medium", "High")
 
-                       var priority by remember {
-                           mutableStateOf(0)
-                       }
 
-                            Text(text = "Priority")
+            OutlinedButton(
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = viewModel.priority.ifEmpty { "Choose flag" },
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(8.dp),
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    items.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = item)
+                            },
+                            onClick = {
+                                viewModel.onEvent(AddEditTodoEvent.OnPriorityChange(item))
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+/*
+        val mContext = LocalContext.current
 
-                           DropdownMenu(
-                                expanded = false, // Toggle expanded state based on user interaction
-                                onDismissRequest = { *//* Handle dismiss request *//* },
+        // Declaring and initializing a calendar
+        val mCalendar = Calendar.getInstance()
+        val mHour = mCalendar[Calendar.HOUR_OF_DAY]
+        val mMinute = mCalendar[Calendar.MINUTE]
+
+        // Value for storing time as a string
+        val mTime = remember { mutableStateOf("") }
+
+        // Creating a TimePicker dialod
+        val mTimePickerDialog = TimePickerDialog(
+            mContext,
+            {_, mHour : Int, mMinute: Int ->
+                mTime.value = "$mHour:$mMinute"
+            }, mHour, mMinute, false
+        )
+
+        Button(onClick = { mTimePickerDialog.show() }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
+            Text(
+                text ="Open Time Picker",
+                color = Color.White)
+        }
+        Spacer(modifier = Modifier.size(100.dp))
+
+        // Display selected time
+        Text(text = "Selected Time: ${mTime.value}", fontSize = 30.sp)*/
+
+
+// SnackbarHost
+
+// TODO:  Trzeba zrobic Timepicker
+
+
+// TODO: Flaga priorytetu
+
+/*
+                   val priorityOptions = listOf("Low", "Medium", "High")
+
+                   var priority by remember {
+                       mutableStateOf(0)
+                   }
+
+                        Text(text = "Priority")
+
+                       DropdownMenu(
+                            expanded = false, // Toggle expanded state based on user interaction
+                            onDismissRequest = { *//* Handle dismiss request *//* },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 priorityOptions.forEachIndexed { index, option ->
@@ -193,8 +294,3 @@ fun AddEditTodoScreen(
                 }
             }
             */
-
-
-        }
-    }
-}

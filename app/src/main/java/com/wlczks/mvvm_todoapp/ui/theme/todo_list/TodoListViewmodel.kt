@@ -23,7 +23,6 @@ class TodoListViewmodel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
 
-
     private var deletedTodo: Todo? = null
 
     fun onEvent(event: TodoListEvent){
@@ -57,7 +56,6 @@ class TodoListViewmodel @Inject constructor(
                         ))
                 }
             }
-
         }
     }
 

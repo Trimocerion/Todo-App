@@ -16,8 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wlczks.mvvm_todoapp.data.Todo
@@ -28,6 +28,7 @@ fun TodoItem(
     onEvent: (TodoListEvent) -> Unit,
     modifier: Modifier = Modifier
 ){
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -40,28 +41,47 @@ fun TodoItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ){
+                horizontalArrangement = Arrangement.Center,
+
+                ) {
                 Text(
                     text = todo.title,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                 )
 
-                    Checkbox(checked = todo.isDone, onCheckedChange ={ isChecked ->
-                        onEvent(TodoListEvent.OnDoneChange(todo, isChecked))
-                    } )
+                Checkbox(checked = todo.isDone, onCheckedChange = { isChecked ->
+                    onEvent(TodoListEvent.OnDoneChange(todo, isChecked))
+                })
 
 
 
-                Spacer(modifier = Modifier.width(8.dp).weight(1f))
+                Spacer(
+                    modifier = Modifier
+                        .width(8.dp)
+                        .weight(1f)
+                )
                 IconButton(onClick = {
                     onEvent(TodoListEvent.OnDeleteTodoClick(todo))
-                }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                }) { Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete") }
 
-                }
             }
+
+            todo.priority?.let { flagged ->
+                Spacer(modifier = Modifier.height(8.dp))
+                val flagColor = when (flagged) {
+                    "High" -> Color.Red
+                    "Normal" -> Color.Blue
+                    "Low" -> Color.Green
+                    else -> Color.Unspecified
+                }
+                Text(
+                    text = flagged,
+                    color = flagColor
+                )
+            }
+
+
             todo.description?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = it)
@@ -69,6 +89,7 @@ fun TodoItem(
         }
     }
 }
+/*
 @Preview
 @Composable
 fun TodoItemPreview() {
@@ -78,6 +99,9 @@ fun TodoItemPreview() {
             description = "Opis",
             isDone = false,
         ),
-        onEvent = { /* Define a preview onEvent action */ }
+        onEvent = { */
+/* Define a preview onEvent action *//*
+ }
     )
 }
+*/
