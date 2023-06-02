@@ -33,6 +33,13 @@ class AddEditTodoViewModel @Inject constructor(
     var priority by mutableStateOf("")
         private set
 
+    var date by mutableStateOf("")
+        private set
+
+
+    var isCreatingTodo by mutableStateOf(false)
+        private set
+
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -45,9 +52,14 @@ class AddEditTodoViewModel @Inject constructor(
                     title = todo.title
                     description = todo.description ?: ""
                     priority = todo.priority ?: ""
+                    date = todo.date ?: ""
+
+                    isCreatingTodo = false
                     this@AddEditTodoViewModel.todo = todo
                 }
             }
+        } else {
+            isCreatingTodo = true
         }
     }
 
@@ -63,6 +75,10 @@ class AddEditTodoViewModel @Inject constructor(
 
             is AddEditTodoEvent.OnPriorityChange -> {
                 priority = event.flagged
+            }
+
+            is AddEditTodoEvent.OnDateChange -> {
+                date = event.date
             }
 
             is AddEditTodoEvent.OnSaveTodoClick -> {
@@ -81,7 +97,8 @@ class AddEditTodoViewModel @Inject constructor(
                             description = description,
                             isDone = todo?.isDone ?: false,
                             id = todo?.id,
-                            priority = priority
+                            priority = priority,
+                            date = date
                         )
                     )
                     sendUiEvent(UiEvent.PopBackStack)

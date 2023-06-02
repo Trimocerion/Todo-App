@@ -26,7 +26,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,7 +34,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.wlczks.mvvm_todoapp.components.HeaderTextComponent
 import com.wlczks.mvvm_todoapp.components.NormalTextComponent
 import com.wlczks.mvvm_todoapp.util.UiEvent
-import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -88,7 +86,7 @@ fun AddEditTodoScreen(
                 .padding(innerPadding)
         ) {
 
-            if (viewModel.title.isNotEmpty() || viewModel.description.isNotEmpty()) {
+            if (!viewModel.isCreatingTodo) {
                 HeaderTextComponent(value = "Edit todo")
                 Spacer(modifier = Modifier.height(8.dp))
             } else {
@@ -120,11 +118,9 @@ fun AddEditTodoScreen(
             )
             // TODO: zrobic czas wprowadzania
 
-            val snackScope = rememberCoroutineScope()
 
             var dateValue by remember { mutableStateOf("") }
             var showDateView by remember { mutableStateOf(false) }
-            var showTimeView by remember { mutableStateOf(false) }
 
             val datePickerState = rememberDatePickerState(
                 initialDisplayMode = DisplayMode.Picker,
@@ -132,6 +128,7 @@ fun AddEditTodoScreen(
             )
 
             val confirmEnabled = datePickerState.selectedDateMillis != null
+
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -143,7 +140,7 @@ fun AddEditTodoScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = dateValue.ifEmpty { "Choose date" },
+                    text = viewModel.date.ifEmpty { "Choose date" },
                     fontSize = 14.sp,
                     modifier = Modifier.padding(8.dp),
                 )
@@ -156,11 +153,11 @@ fun AddEditTodoScreen(
                     onDismissRequest = {
                         showDateView = false
                     },
+
                     confirmButton = {
                         TextButton(
                             onClick = {
                                 showDateView = false
-                                showTimeView = true
                                 val selectedDate =
                                     Instant.ofEpochMilli(
                                         datePickerState.selectedDateMillis ?: 0L
@@ -169,12 +166,13 @@ fun AddEditTodoScreen(
                                         .toLocalDate()
                                 dateValue =
                                     selectedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                                snackScope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        "Selected date: $dateValue"
+                                viewModel.onEvent(AddEditTodoEvent.OnDateChange(dateValue))
+                                /*   snackScope.launch {
+                                       snackbarHostState.showSnackbar(
+                                           "Selected date: $dateValue"
 
-                                    )
-                                }
+                                       )
+                                   }*/
                             },
                             enabled = confirmEnabled
                         ) {

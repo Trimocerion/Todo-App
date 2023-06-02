@@ -53,9 +53,6 @@ fun TodoItem(
                 Checkbox(checked = todo.isDone, onCheckedChange = { isChecked ->
                     onEvent(TodoListEvent.OnDoneChange(todo, isChecked))
                 })
-
-
-
                 Spacer(
                     modifier = Modifier
                         .width(8.dp)
@@ -79,6 +76,11 @@ fun TodoItem(
                     text = flagged,
                     color = flagColor
                 )
+            }
+
+            todo.date.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = it.toString().format("dd.MM.yyyy"))
             }
 
 

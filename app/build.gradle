@@ -96,6 +96,10 @@ dependencies {
     //datepicker
     implementation 'com.maxkeppeler.sheets-compose-dialogs:core:1.1.1'
 
+    //
+    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+
+
 }
 kapt {
     correctErrorTypes true

@@ -18,5 +18,7 @@ data class Todo(
 
     val priority: String?,
 
+    val date: String?,
+
 
     )
