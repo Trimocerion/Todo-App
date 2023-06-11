@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import com.wlczks.mvvm_todoapp.notifications.TodoNotificationService
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -11,13 +12,14 @@ class TodoApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
         createNotificationChannel()
     }
 
     private fun createNotificationChannel() {
 
         val channel = NotificationChannel(
-            CounterNotificationService.NOTIFICATION_CHANNEL_ID,
+            TodoNotificationService.NOTIFICATION_CHANNEL_ID,
             "Todo expiry notification",
             NotificationManager.IMPORTANCE_HIGH
         )

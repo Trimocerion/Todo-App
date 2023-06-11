@@ -1,12 +1,14 @@
-package com.wlczks.mvvm_todoapp
+package com.wlczks.mvvm_todoapp.notifications
 
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.wlczks.mvvm_todoapp.MainActivity
+import com.wlczks.mvvm_todoapp.R
 
-class CounterNotificationService(
+class TodoNotificationService(
     private val context: Context,
 ) {
     private val notificationManager =

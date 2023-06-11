@@ -197,7 +197,6 @@ fun AddEditTodoScreen(
 
             NormalTextComponent(value = "Flag")
 
-            val items = listOf("High", "Normal", "Low")
 
             var expanded by remember { mutableStateOf(false) }
 
@@ -219,22 +218,29 @@ fun AddEditTodoScreen(
                     onDismissRequest = { expanded = false },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    items.forEachIndexed { index, item ->
+                    Priority.values().forEach {
                         DropdownMenuItem(
                             text = {
-                                Text(text = item)
+                                Text(text = it.name)
                             },
                             onClick = {
-                                viewModel.onEvent(AddEditTodoEvent.OnPriorityChange(item))
+                                viewModel.onEvent(AddEditTodoEvent.OnPriorityChange(it.name))
                                 expanded = false
-                            }
-                        )
+                            })
                     }
+
                 }
             }
         }
     }
 }
+
+enum class Priority {
+    HIGH,
+    NORMAL,
+    LOW
+}
+
 /*
         val mContext = LocalContext.current
 
