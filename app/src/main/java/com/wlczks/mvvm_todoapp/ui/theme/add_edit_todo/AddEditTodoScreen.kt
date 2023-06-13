@@ -33,10 +33,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.wlczks.mvvm_todoapp.components.HeaderTextComponent
 import com.wlczks.mvvm_todoapp.components.NormalTextComponent
+import com.wlczks.mvvm_todoapp.util.Priority
 import com.wlczks.mvvm_todoapp.util.UiEvent
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -167,12 +169,6 @@ fun AddEditTodoScreen(
                                 dateValue =
                                     selectedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                                 viewModel.onEvent(AddEditTodoEvent.OnDateChange(dateValue))
-                                /*   snackScope.launch {
-                                       snackbarHostState.showSnackbar(
-                                           "Selected date: $dateValue"
-
-                                       )
-                                   }*/
                             },
                             enabled = confirmEnabled
                         ) {
@@ -234,67 +230,3 @@ fun AddEditTodoScreen(
         }
     }
 }
-
-enum class Priority {
-    HIGH,
-    NORMAL,
-    LOW
-}
-
-/*
-        val mContext = LocalContext.current
-
-        // Declaring and initializing a calendar
-        val mCalendar = Calendar.getInstance()
-        val mHour = mCalendar[Calendar.HOUR_OF_DAY]
-        val mMinute = mCalendar[Calendar.MINUTE]
-
-        // Value for storing time as a string
-        val mTime = remember { mutableStateOf("") }
-
-        // Creating a TimePicker dialod
-        val mTimePickerDialog = TimePickerDialog(
-            mContext,
-            {_, mHour : Int, mMinute: Int ->
-                mTime.value = "$mHour:$mMinute"
-            }, mHour, mMinute, false
-        )
-
-        Button(onClick = { mTimePickerDialog.show() }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
-            Text(
-                text ="Open Time Picker",
-                color = Color.White)
-        }
-        Spacer(modifier = Modifier.size(100.dp))
-
-        // Display selected time
-        Text(text = "Selected Time: ${mTime.value}", fontSize = 30.sp)*/
-
-
-// SnackbarHost
-
-// TODO:  Trzeba zrobic Timepicker
-
-
-// TODO: Flaga priorytetu
-
-/*
-                   val priorityOptions = listOf("Low", "Medium", "High")
-
-                   var priority by remember {
-                       mutableStateOf(0)
-                   }
-
-                        Text(text = "Priority")
-
-                       DropdownMenu(
-                            expanded = false, // Toggle expanded state based on user interaction
-                            onDismissRequest = { *//* Handle dismiss request *//* },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                priorityOptions.forEachIndexed { index, option ->
-                    DropdownMenuItem(text = { *//*TODO*//* }, onClick = { *//*TODO*//* })
-                    Text(text = option)
-                }
-            }
-            */

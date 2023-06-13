@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
                 )
 
 
-                //dodane w celu testu
+                //notification permission
 
 
                 val navController = rememberNavController()

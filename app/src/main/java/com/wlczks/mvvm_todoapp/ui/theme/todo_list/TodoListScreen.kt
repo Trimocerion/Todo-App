@@ -8,8 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -26,15 +24,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.wlczks.mvvm_todoapp.components.SortingButton
 import com.wlczks.mvvm_todoapp.data.Todo
 import com.wlczks.mvvm_todoapp.notifications.TodoNotificationService
-import com.wlczks.mvvm_todoapp.ui.theme.add_edit_todo.Priority
+import com.wlczks.mvvm_todoapp.util.Priority
+import com.wlczks.mvvm_todoapp.util.SortingOption
 import com.wlczks.mvvm_todoapp.util.UiEvent
+import exportTodosToTxt
 
 
 @Composable
@@ -72,6 +72,7 @@ fun ToDoListScreen(
 
     //test
     val service = TodoNotificationService(LocalContext.current)
+    val context = LocalContext.current
     //test
 
     LaunchedEffect(key1 = true) {
@@ -135,6 +136,18 @@ fun ToDoListScreen(
                         isSortDescending = !isSortDescending
                     }
                 )
+                TextButton(
+                    onClick = {
+                        exportTodosToTxt(context, sortedTodos)
+                        print("export todos to txt")
+                    },
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .weight(1f)
+                ) {
+                    Text(text = "Export")
+
+                }
             }
         }
     ) { innerPadding ->
@@ -159,32 +172,3 @@ fun ToDoListScreen(
     }
 }
 
-@Composable
-fun SortingButton(
-    text: String,
-    isSelected: Boolean,
-    isSortDescending: Boolean,
-    onClick: () -> Unit
-) {
-    TextButton(
-        onClick = onClick,
-        modifier = Modifier.padding(end = 8.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text)
-            if (isSelected) {
-                Icon(
-                    imageVector = if (isSortDescending) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                    contentDescription = "Sort Arrow"
-                )
-            }
-        }
-    }
-}
-
-
-enum class SortingOption {
-    DATE,
-    PRIORITY,
-    TITLE,
-}

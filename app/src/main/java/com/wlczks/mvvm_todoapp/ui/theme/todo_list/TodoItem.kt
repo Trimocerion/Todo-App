@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,72 +33,79 @@ fun TodoItem(
     todo: Todo,
     onEvent: (TodoListEvent) -> Unit,
     modifier: Modifier = Modifier
-){
-
+) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-    ){
+    ) {
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .width(IntrinsicSize.Max),
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-
-                ) {
+            ) {
                 Text(
                     text = todo.title,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                )
-
-                Checkbox(checked = todo.isDone, onCheckedChange = { isChecked ->
-                    onEvent(TodoListEvent.OnDoneChange(todo, isChecked))
-                })
-
-                Spacer(
                     modifier = Modifier
-                        .width(8.dp)
                         .weight(1f)
+                        .width(IntrinsicSize.Max)
                 )
 
-
-                PrioritySquare(priority = todo.priority, size = 24.dp)
-
+                Checkbox(
+                    checked = todo.isDone,
+                    onCheckedChange = { isChecked ->
+                        onEvent(TodoListEvent.OnDoneChange(todo, isChecked))
+                    },
+                    modifier = Modifier.width(24.dp)
+                )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                todo.priority?.let { flagged ->
-                    val flagColor = when (flagged) {
-                        "HIGH" -> Color.Red
-                        "NORMAL" -> Color.Blue
-                        "LOW" -> Color.Green
-                        else -> Color.Unspecified
-                    }
-                    Text(
-                        text = flagged,
-                        color = flagColor,
-                        fontSize = 15.sp,
+                PrioritySquare(priority = todo.priority, size = 24.dp)
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                /* todo.priority?.let { flagged ->
+                     val flagColor = when (flagged) {
+                         "HIGH" -> Color.Red
+                         "NORMAL" -> Color.Blue
+                         "LOW" -> Color.Green
+                         else -> Color.Unspecified
+                     }
+                     Text(
+                         text = flagged,
+                         color = flagColor,
+                         fontSize = 15.sp,
+                     )
+                 }*/
+
+                IconButton(
+                    onClick = {
+                        onEvent(TodoListEvent.OnDeleteTodoClick(todo))
+                    },
+                    modifier = Modifier.width(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete"
                     )
                 }
-
-                IconButton(onClick = {
-                    onEvent(TodoListEvent.OnDeleteTodoClick(todo))
-                }) { Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete") }
-
             }
 
             todo.date.let {
-                Text(text = it.toString().format("dd.MM.yyyy"), fontSize = 12.sp)
+                Text(
+                    text = it.toString().format("dd.MM.yyyy"),
+                    fontSize = 12.sp
+                )
             }
-
-
-
-
 
             todo.description?.let {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -125,23 +133,5 @@ fun PrioritySquare(
             .size(size)
             .background(color = priorityColor, shape = CircleShape)
     ) {
-        // Empty content
     }
 }
-
-/*
-@Preview
-@Composable
-fun TodoItemPreview() {
-    TodoItem(
-        todo = Todo(
-            title = "Tytuł",
-            description = "Opis",
-            isDone = false,
-        ),
-        onEvent = { */
-/* Define a preview onEvent action *//*
- }
-    )
-}
-*/
