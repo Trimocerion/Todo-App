@@ -1,11 +1,13 @@
 import android.content.Context
+import android.os.Environment
 import android.widget.Toast
 import com.wlczks.mvvm_todoapp.data.Todo
 import java.io.File
 import java.io.FileOutputStream
 
 fun exportTodosToTxt(context: Context, todos: List<Todo>) {
-    val exportFile = File(context.filesDir, "todos.txt")
+    val exportDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val exportFile = File(exportDir, "todos.txt")
     try {
         FileOutputStream(exportFile).use { fileOutputStream ->
             for (todo in todos) {

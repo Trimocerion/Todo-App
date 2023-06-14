@@ -1,9 +1,11 @@
 package com.wlczks.mvvm_todoapp.ui.theme.add_edit_todo
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
@@ -12,6 +14,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -20,6 +23,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,7 +51,14 @@ fun AddEditTodoScreen(
     onPopBackStack: () -> Unit,
     viewModel: AddEditTodoViewModel = hiltViewModel()
 ) {
+    val isDarkMode = isSystemInDarkTheme()
     val snackbarHostState = remember { SnackbarHostState() }
+
+
+    val colorScheme = if (isDarkMode) darkColorScheme() else lightColorScheme()
+
+
+
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -81,150 +93,163 @@ fun AddEditTodoScreen(
             }
         }
     ) { innerPadding ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = MaterialTheme.typography
         ) {
-
-            if (!viewModel.isCreatingTodo) {
-                HeaderTextComponent(value = "Edit todo")
-                Spacer(modifier = Modifier.height(8.dp))
-            } else {
-                HeaderTextComponent(value = "Add todo")
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            TextField(
-                value = viewModel.title,
-                onValueChange = {
-                    viewModel.onEvent(AddEditTodoEvent.OnTitleChange(it))
-                },
-                placeholder = {
-                    Text(text = "Title")
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            TextField(
-                value = viewModel.description,
-                onValueChange = {
-                    viewModel.onEvent(AddEditTodoEvent.OnDescriptionChange(it))
-                },
-                placeholder = {
-                    Text(text = "Desc")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = false,
-                maxLines = 5
-            )
-            // TODO: zrobic czas wprowadzania
-
-
-            var dateValue by remember { mutableStateOf("") }
-            var showDateView by remember { mutableStateOf(false) }
-
-            val datePickerState = rememberDatePickerState(
-                initialDisplayMode = DisplayMode.Picker,
-                initialSelectedDateMillis = null,
-            )
-
-            val confirmEnabled = datePickerState.selectedDateMillis != null
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            NormalTextComponent(value = "Date")
-
-            OutlinedButton(
-                onClick = { showDateView = true },
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(innerPadding)
             ) {
-                Text(
-                    text = viewModel.date.ifEmpty { "Choose date" },
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(8.dp),
-                )
-            }
 
-
-
-            if (showDateView) {
-                DatePickerDialog(
-                    onDismissRequest = {
-                        showDateView = false
-                    },
-
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                showDateView = false
-                                val selectedDate =
-                                    Instant.ofEpochMilli(
-                                        datePickerState.selectedDateMillis ?: 0L
-                                    )
-                                        .atZone(ZoneId.systemDefault())
-                                        .toLocalDate()
-                                dateValue =
-                                    selectedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                                viewModel.onEvent(AddEditTodoEvent.OnDateChange(dateValue))
-                            },
-                            enabled = confirmEnabled
-                        ) {
-                            Text("OK")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = {
-                                showDateView = false
-                            }
-                        ) {
-                            Text("Cancel")
-                        }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
+                if (!viewModel.isCreatingTodo) {
+                    HeaderTextComponent(value = "Edit todo")
+                    Spacer(modifier = Modifier.height(8.dp))
+                } else {
+                    HeaderTextComponent(value = "Add todo")
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            NormalTextComponent(value = "Flag")
-
-
-            var expanded by remember { mutableStateOf(false) }
-
-
-
-
-
-            OutlinedButton(
-                onClick = { expanded = true },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = viewModel.priority.ifEmpty { "Choose flag" },
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(8.dp),
+                TextField(
+                    value = viewModel.title,
+                    onValueChange = {
+                        viewModel.onEvent(AddEditTodoEvent.OnTitleChange(it))
+                    },
+                    placeholder = {
+                        Text(text = "Title")
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = viewModel.description,
+                    onValueChange = {
+                        viewModel.onEvent(AddEditTodoEvent.OnDescriptionChange(it))
+                    },
+                    placeholder = {
+                        Text(text = "Desc")
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Priority.values().forEach {
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = it.name)
-                            },
-                            onClick = {
-                                viewModel.onEvent(AddEditTodoEvent.OnPriorityChange(it.name))
-                                expanded = false
-                            })
-                    }
+                    singleLine = false,
+                    maxLines = 5
+                )
+                // TODO: zrobic czas wprowadzania
 
+
+                var dateValue by remember { mutableStateOf("") }
+                var showDateView by remember { mutableStateOf(false) }
+
+                val datePickerState = rememberDatePickerState(
+                    initialDisplayMode = DisplayMode.Picker,
+                    initialSelectedDateMillis = null,
+                )
+
+                val confirmEnabled = datePickerState.selectedDateMillis != null
+
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                NormalTextComponent(value = "Date")
+
+                OutlinedButton(
+                    onClick = { showDateView = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+
+                ) {
+                    Text(
+                        text = viewModel.date.ifEmpty { "Choose date" },
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(8.dp),
+                    )
+                }
+
+
+
+                if (showDateView) {
+                    DatePickerDialog(
+                        onDismissRequest = {
+                            showDateView = false
+                        },
+
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    showDateView = false
+                                    val selectedDate =
+                                        Instant.ofEpochMilli(
+                                            datePickerState.selectedDateMillis ?: 0L
+                                        )
+                                            .atZone(ZoneId.systemDefault())
+                                            .toLocalDate()
+                                    dateValue =
+                                        selectedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                                    viewModel.onEvent(AddEditTodoEvent.OnDateChange(dateValue))
+                                },
+                                enabled = confirmEnabled
+                            ) {
+                                Text("OK")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = {
+                                    showDateView = false
+                                }
+                            ) {
+                                Text("Cancel")
+                            }
+                        }
+                    ) {
+                        DatePicker(state = datePickerState)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                NormalTextComponent(value = "Flag")
+
+
+                var expanded by remember { mutableStateOf(false) }
+
+
+
+
+
+                OutlinedButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Text(
+                        text = viewModel.priority.ifEmpty { "Choose flag" },
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(8.dp),
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Priority.values().forEach {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = it.name)
+                                },
+                                onClick = {
+                                    viewModel.onEvent(AddEditTodoEvent.OnPriorityChange(it.name))
+                                    expanded = false
+                                })
+                        }
+
+                    }
                 }
             }
         }
